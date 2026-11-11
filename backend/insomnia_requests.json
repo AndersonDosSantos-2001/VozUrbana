@@ -1,0 +1,488 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-11-08T22:42:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2026.1.0",
+  "resources": [
+    {
+      "_id": "wrk_voz_urbana",
+      "parentId": null,
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "name": "vozUrbana API - Zeladoria Pública Municipal",
+      "description": "Coleção completa de testes das Fases 1 a 4 da API vozUrbana (Node.js + Express + Sequelize + Supabase PostgreSQL).",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_voz_urbana_base",
+      "parentId": "wrk_voz_urbana",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "name": "Ambiente Local (vozUrbana)",
+      "data": {
+        "base_url": "http://localhost:3333/api",
+        "token_cidadao": "COLE_AQUI_O_TOKEN_DO_CIDADAO",
+        "token_gestor": "COLE_AQUI_O_TOKEN_DO_GESTOR",
+        "denuncia_id": 1
+      },
+      "isPrivate": false,
+      "_type": "environment"
+    },
+    {
+      "_id": "fld_auth",
+      "parentId": "wrk_voz_urbana",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "name": "1. Autenticação e Usuários (Fase 2)",
+      "description": "Rotas de cadastro tradicional, login por E-mail/CPF, login Google OAuth2 e complemento de CPF.",
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_denuncias",
+      "parentId": "wrk_voz_urbana",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "name": "2. Categorias e Denúncias (Fase 3)",
+      "description": "Verificação de duplicidade (Haversine 40m), criação transacional com 1º apoio, Feed, Minhas Denúncias, Edição/Exclusão (Trava Dupla) e Toggle de Apoio.",
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_dashboard",
+      "parentId": "wrk_voz_urbana",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "name": "3. Dashboard Público de Gráficos (Fase 4)",
+      "description": "Estatísticas agregadas por categoria, top bairros e taxa de resolução.",
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_gabinete",
+      "parentId": "wrk_voz_urbana",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "name": "4. Painel do Gabinete - Exclusivo GESTOR (Fase 4)",
+      "description": "Fila de triagem e atualização de status oficial da prefeitura (protegido por RBAC gestorMiddleware).",
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_health",
+      "parentId": "fld_auth",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/health",
+      "name": "Healthcheck da API",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "_type": "request"
+    },
+    {
+      "_id": "req_auth_register",
+      "parentId": "fld_auth",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/auth/register",
+      "name": "Cadastrar Cidadão (Bloqueia Mass Assignment perfil=GESTOR)",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Carlos Silva\",\n  \"email\": \"carlos.silva@email.com\",\n  \"cpf\": \"529.982.247-25\",\n  \"senha\": \"Cidadao@2026\",\n  \"perfil\": \"GESTOR\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_auth_login_cidadao",
+      "parentId": "fld_auth",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/auth/login",
+      "name": "Login Cidadão (Por E-mail ou CPF)",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"cpf\": \"529.982.247-25\",\n  \"senha\": \"Cidadao@2026\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_auth_login_gestor",
+      "parentId": "fld_auth",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/auth/login",
+      "name": "Login Gestor da Prefeitura (Conta do Seeder)",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"gabinete@vozurbana.gov.br\",\n  \"senha\": \"Prefeitura@2026\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_auth_google",
+      "parentId": "fld_auth",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/auth/google",
+      "name": "Login / Cadastro via Google OAuth2",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"idToken\": \"SEU_ID_TOKEN_DO_GOOGLE_AQUI\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_usuarios_completar_cpf",
+      "parentId": "fld_auth",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/usuarios/completar-cpf",
+      "name": "Completar CPF (Contas Google)",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"cpf\": \"111.444.777-35\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_cidadao }}"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_auth_me",
+      "parentId": "fld_auth",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/auth/me",
+      "name": "Meus Dados de Perfil (/auth/me)",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_cidadao }}"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_categorias_listar",
+      "parentId": "fld_denuncias",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/categorias",
+      "name": "Listar Categorias Ativas",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "_type": "request"
+    },
+    {
+      "_id": "req_denuncias_duplicidade",
+      "parentId": "fld_denuncias",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/denuncias/verificar-duplicidade",
+      "name": "1. Verificar Duplicidade (Raio <= 40m via Haversine)",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "name": "lat",
+          "value": "-8.1123456"
+        },
+        {
+          "name": "lng",
+          "value": "-35.0154321"
+        },
+        {
+          "name": "categoria_id",
+          "value": "1"
+        }
+      ],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_cidadao }}"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_denuncias_criar",
+      "parentId": "fld_denuncias",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/denuncias",
+      "name": "2. Criar Nova Denúncia (Transaction + 1º Apoio Automático)",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"categoria_id\": 1,\n  \"observacao\": \"Cratera aberta na faixa da direita após a chuva.\",\n  \"latitude\": -8.1123456,\n  \"longitude\": -35.0154321,\n  \"endereco_aproximado\": \"Av. Barreto de Menezes, 450\",\n  \"bairro\": \"Prazeres\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_cidadao }}"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_denuncias_feed",
+      "parentId": "fld_denuncias",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/denuncias",
+      "name": "3. Listar Feed Geral (Com Filtros e Distância Haversine)",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "name": "lat",
+          "value": "-8.1120000"
+        },
+        {
+          "name": "lng",
+          "value": "-35.0150000"
+        },
+        {
+          "name": "ordenar",
+          "value": "menor_distancia"
+        }
+      ],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_cidadao }}"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_denuncias_minhas",
+      "parentId": "fld_denuncias",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/denuncias/minhas",
+      "name": "4. Listar Minhas Denúncias (Criadas + Apoiadas)",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_cidadao }}"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_denuncias_apoiar",
+      "parentId": "fld_denuncias",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/denuncias/{{ _.denuncia_id }}/apoiar",
+      "name": "5. Alternar Apoio / Curtida (Toggle Like/Unlike)",
+      "method": "POST",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_cidadao }}"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_denuncias_atualizar",
+      "parentId": "fld_denuncias",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/denuncias/{{ _.denuncia_id }}",
+      "name": "6A. Editar Denúncia (Trava Dupla: Autor + PENDENTE)",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"observacao\": \"Cratera aumentou após o final de semana, risco de acidente.\",\n  \"endereco_aproximado\": \"Av. Barreto de Menezes, 452\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_cidadao }}"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_denuncias_excluir",
+      "parentId": "fld_denuncias",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/denuncias/{{ _.denuncia_id }}",
+      "name": "6B. Excluir Denúncia (Trava Dupla: Autor + PENDENTE)",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_cidadao }}"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_dashboard_estatisticas_geral",
+      "parentId": "fld_dashboard",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/dashboard/estatisticas",
+      "name": "Estatísticas Gerais (Gráficos de Pizza e Colunas)",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "_type": "request"
+    },
+    {
+      "_id": "req_dashboard_estatisticas_filtrado",
+      "parentId": "fld_dashboard",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/dashboard/estatisticas",
+      "name": "Estatísticas Filtradas por Bairro e Período",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "name": "bairro",
+          "value": "Prazeres"
+        },
+        {
+          "name": "periodo_dias",
+          "value": "30"
+        },
+        {
+          "name": "status",
+          "value": "TODOS"
+        }
+      ],
+      "headers": [],
+      "_type": "request"
+    },
+    {
+      "_id": "req_dashboard_bairros",
+      "parentId": "fld_dashboard",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/dashboard/bairros",
+      "name": "Listar Bairros com Ocorrências",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "_type": "request"
+    },
+    {
+      "_id": "req_gabinete_fila",
+      "parentId": "fld_gabinete",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/gabinete/denuncias",
+      "name": "Listar Fila de Triagem (Ordenado por Prioridade / Mais Apoios)",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "name": "ordenar",
+          "value": "prioridade"
+        }
+      ],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_gestor }}"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_gabinete_status",
+      "parentId": "fld_gabinete",
+      "modified": 1794177720000,
+      "created": 1794177720000,
+      "url": "{{ _.base_url }}/gabinete/denuncias/{{ _.denuncia_id }}/status",
+      "name": "Atualizar Status e Gravar Resposta da Prefeitura (Exclusivo GESTOR)",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"status\": \"EM_ANDAMENTO\",\n  \"resposta_prefeitura\": \"Equipe de tapa-buracos agendada para esta semana.\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_gestor }}"
+        }
+      ],
+      "_type": "request"
+    }
+  ]
+}
